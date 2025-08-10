@@ -11,11 +11,13 @@ export class Ffmpeg implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Ffmpeg',
 		name: 'ffmpeg',
+		icon: { dark: 'file:Ffmpeg.icon.svg', light: 'file:Ffmpeg.icon.svg' },
 		group: ['transform'],
 		version: 1,
 		description: 'A node that uses ffmpeg to transform media',
+		subtitle: '={{"ffmpeg " + $parameter["command"]}}',
 		defaults: {
-			name: 'Ffmpeg',
+			name: 'Run ffmpeg',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -42,16 +44,12 @@ export class Ffmpeg implements INodeType {
 				name: 'command',
 				type: 'string',
 				default: '',
-				placeholder: '-i {input} -c:v libx264 -c:a aac {output}',
+				placeholder: '-ss 0 -i {input} -t 30 -c copy {output}',
 				description: 'The ffmpeg command to execute use {input} and {output} to refer to the input and output files',
 			},
 		],
 	};
 
-	// The function below is responsible for actually doing whatever this node
-	// is supposed to do. In this case, we're just appending the `myString` property
-	// with whatever the user has entered.
-	// You can make async calls and use `await`.
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		let returnData: INodeExecutionData[] = [];
