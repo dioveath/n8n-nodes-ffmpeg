@@ -10,6 +10,9 @@
     "convert"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/dioveath/n8n-nodes-ffmpeg",
   "author": {
     "name": "rAi",
