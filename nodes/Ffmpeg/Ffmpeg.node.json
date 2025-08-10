@@ -1,0 +1,40 @@
+{
+	"node": "n8n-nodes-base.ffmpeg",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Utility"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/dioveath/n8n-nodes-ffmpeg"
+			},
+			{
+				"url": "https://ffmpeg.org/documentation.html"
+			}
+		]
+	},
+	"alias": [
+		"ffmpeg",
+        "video",
+        "audio",
+        "convert",
+        "media",
+        "ffmpeg-node",
+        "transcode",
+        "compress",
+        "trim",
+        "gif",
+        "thumbnail",
+        "extract",
+        "encode",
+        "decode",
+        "mp4",
+        "h264",
+        "aac",
+        "mp3",
+        "webm",
+        "ogg",
+        "flac",
+        "wav"        
+	]
+}
