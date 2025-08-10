@@ -1,6 +1,6 @@
 {
   "name": "@raisaroj/n8n-nodes-ffmpeg",
-  "version": "0.1.0",
+  "version": "0.1.13",
   "description": "FFmpeg node for n8n. This node provides a simple interface to use FFmpeg commands directly within n8n workflows.",
   "keywords": [
     "n8n-community-node-package",
