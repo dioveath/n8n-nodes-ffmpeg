@@ -1,55 +1,54 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-ffmpeg
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use FFmpeg in your n8n workflows to transform media files.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+FFmpeg is a powerful multimedia framework that can decode, encode, transcode, mux, demux, stream, filter and play various media formats. This node provides a simple interface to use FFmpeg commands directly within n8n workflows.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## Prerequisites
+[Installation](#installation)  
+[Operations](#operations)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
 
-You need the following installed on your development machine:
+## Installation
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-## Using this starter
+## Operations
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+This node provides a single operation that allows you to run FFmpeg commands on media files:
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `pnpm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Change the repository name in the `.env` file:
-   ```
-   REPO_NAME=your-custom-repo-name
-   ```
-8. Run `pnpm lint` to check for errors or `pnpm lintfix` to automatically fix errors when possible.
-9. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-10. To deploy and test your nodes with Docker, run:
-    ```
-    pnpm run deploy
-    ```
-    This will compile TypeScript, build icons, and start the Docker containers defined in `docker-compose.yml`.
-11. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-12. Update the LICENSE file to use your details.
-13. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+- **Transform Media**: Apply FFmpeg commands to transform media files (video, audio, images)
 
-## More information
+## Compatibility
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+This node requires n8n version that supports n8nNodesApiVersion 1.
 
-## License
+Node.js version >= 20.15 is required.
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Usage
+
+### Basic Usage
+
+1. Add the FFmpeg node to your workflow
+2. Connect it to a node that provides binary data (e.g., HTTP Request, Read Binary File)
+3. Configure the following parameters:
+   - **Command**: The FFmpeg command to execute. Use `{input}` and `{output}` placeholders to refer to the input and output files
+   - **Output File Name**: The name of the output file (including extension)
+   - **Output Binary**: The name of the binary property to store the output (default: 'data')
+
+### Example Commands
+
+- Convert video format: `-i {input} -c:v libx264 -c:a aac {output}`
+- Extract audio from video: `-i {input} -vn -acodec copy {output}`
+- Resize video: `-i {input} -vf scale=640:360 {output}`
+- Trim video: `-i {input} -ss 00:00:10 -to 00:00:20 -c copy {output}`
+- Create a thumbnail: `-i {input} -ss 00:00:05 -vframes 1 {output}`
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
+* [FFmpeg documentation](https://ffmpeg.org/documentation.html)
+* [FFmpeg command line examples](https://ffmpeg.org/ffmpeg.html#Examples)
