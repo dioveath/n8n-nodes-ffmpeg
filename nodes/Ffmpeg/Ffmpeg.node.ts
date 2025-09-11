@@ -6,6 +6,7 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 import * as ffmpeg from './action/ffmpeg.operation';
+import * as ffprobe from './action/ffprobe.operation';
 
 export class Ffmpeg implements INodeType {
 	description: INodeTypeDescription = {
@@ -15,7 +16,7 @@ export class Ffmpeg implements INodeType {
 		group: ['transform'],
 		version: 1,
 		description: 'A node that uses ffmpeg to transform media',
-		subtitle: '={{"ffmpeg " + $parameter["command"]}}',
+		subtitle: '={{$parameter["tool"] + " " + $parameter["command"]}}',
 		defaults: {
 			name: 'Run ffmpeg',
 		},
@@ -24,9 +25,31 @@ export class Ffmpeg implements INodeType {
 		usableAsTool: true,
 		properties: [
 			{
+				displayName: 'Tool',
+				name: 'tool',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Ffmpeg',
+						value: 'ffmpeg'
+					},
+					{
+						name: 'Ffprobe',
+						value: 'ffprobe'
+					}
+				],
+				default: 'ffmpeg'
+			},
+			{
 				displayName: 'Output File Name',
 				name: 'outputFileName',
 				type: 'string',
+				displayOptions: {
+					show: {
+						tool: ['ffmpeg']
+					}
+				},
 				default: '',
 				placeholder: 'output.mp4',
 				description: 'The name of the output file',
@@ -35,6 +58,11 @@ export class Ffmpeg implements INodeType {
 				displayName: 'Output Binary',
 				name: 'outputBinary',
 				type: 'string',
+				displayOptions: {
+					show: {
+						tool: ['ffmpeg']
+					}
+				},				
 				default: 'data',
 				placeholder: 'data',
 				description: 'The description text',
@@ -45,7 +73,7 @@ export class Ffmpeg implements INodeType {
 				type: 'string',
 				default: '',
 				placeholder: '-ss 0 -i {input} -t 30 -c copy {output}',
-				description: 'The ffmpeg command to execute use {input} and {output} to refer to the input and output files',
+				description: 'The ffmpeg command to execute use {input} and {output} to refer to the input and output file. The {input} comes from binary output of the previous node.',
 			},
 		],
 	};
@@ -54,7 +82,14 @@ export class Ffmpeg implements INodeType {
 		const items = this.getInputData();
 		let returnData: INodeExecutionData[] = [];
 
-		returnData = await ffmpeg.execute.call(this, items);
+		const tool = this.getNodeParameter('tool', 0) as string;
+		this.logger.info("TOOL: " + tool);
+
+		if (tool === 'ffmpeg') {
+			returnData = await ffmpeg.execute.call(this, items);
+		} else if (tool === 'ffprobe') {
+			returnData = await ffprobe.execute.call(this, items);
+		}
 		
 		return [returnData];
 	}
