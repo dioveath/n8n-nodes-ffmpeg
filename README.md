@@ -18,9 +18,10 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-This node provides a single operation that allows you to run FFmpeg commands on media files:
+This node provides tools that allow you to run FFmpeg and FFprobe commands on media files:
 
-- **Transform Media**: Apply FFmpeg commands to transform media files (video, audio, images)
+- **FFmpeg**: Transform media files, such as videos, audio, and images
+- **FFprobe**: Inspect media files and return metadata
 
 ## Compatibility
 
@@ -35,9 +36,13 @@ Node.js version >= 20.15 is required.
 1. Add the FFmpeg node to your workflow
 2. Connect it to a node that provides binary data (e.g., HTTP Request, Read Binary File)
 3. Configure the following parameters:
-   - **Command**: The FFmpeg command to execute. Use `{input}` and `{output}` placeholders to refer to the input and output files
+   - **Tool**: Choose `Ffmpeg` to transform media or `Ffprobe` to inspect media
+   - **Input Binary Fields**: Optional comma-separated list of binary fields to use as inputs. Leave empty to use the first binary field.
+   - **Command**: The command to execute. Use `{input}` for the first input file, `{input1}`, `{input2}`, etc. for multiple input files, and `{output}` for FFmpeg output files.
    - **Output File Name**: The name of the output file (including extension)
    - **Output Binary**: The name of the binary property to store the output (default: 'data')
+
+For FFmpeg, the command should write to `{output}`. For FFprobe, the command should print metadata to stdout.
 
 ### Example Commands
 
@@ -46,6 +51,8 @@ Node.js version >= 20.15 is required.
 - Resize video: `-i {input} -vf scale=640:360 {output}`
 - Trim video: `-i {input} -ss 00:00:10 -to 00:00:20 -c copy {output}`
 - Create a thumbnail: `-i {input} -ss 00:00:05 -vframes 1 {output}`
+- Combine video and audio from separate binary fields: `-i {input1} -i {input2} -c:v copy -c:a aac {output}`
+- Probe media as JSON: `-v quiet -print_format json -show_format -show_streams {input}`
 
 ## Resources
 
