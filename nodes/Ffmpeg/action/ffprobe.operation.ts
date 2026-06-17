@@ -33,6 +33,29 @@ function runFfprobe(command: string): Promise<string> {
     })
 }
 
+function getInputBinaryFields(inputBinaryFields: string, item: INodeExecutionData): string[] {
+    const configuredFields = inputBinaryFields
+        .split(',')
+        .map((field) => field.trim())
+        .filter(Boolean);
+
+    if (configuredFields.length > 0) {
+        return configuredFields;
+    }
+
+    return item.binary ? Object.keys(item.binary).slice(0, 1) : [];
+}
+
+function replaceInputPlaceholders(command: string, inputFilePaths: string[]): string {
+    let commandWithInputs = command.split('{input}').join(inputFilePaths[0] || '');
+
+    inputFilePaths.forEach((inputFilePath, index) => {
+        commandWithInputs = commandWithInputs.split(`{input${index + 1}}`).join(inputFilePath);
+    });
+
+    return commandWithInputs;
+}
+
 
 export async function execute(
     this: IExecuteFunctions,
@@ -41,26 +64,32 @@ export async function execute(
     const returnData: INodeExecutionData[] = [];
 
     const ffprobeCommand = this.getNodeParameter('command', 0) as string;
+    const inputBinaryFields = this.getNodeParameter('inputBinaryFields', 0) as string;
     
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (!item.binary) continue;
 
-        const [binaryKey] = Object.keys(item.binary);
-        if (!binaryKey) continue;
-
-        const binaryInfo = item.binary[binaryKey];
-        if (!binaryInfo) continue;
-
-        const inputExtension = path.extname(binaryInfo.fileName || '') || '.mp4';
-        const tempInputFilePath = path.join(os.tmpdir(), `input_${Date.now()}${inputExtension}`);
+        const tempInputFilePaths: string[] = [];
 
         try {
-            const inputBuffer = await this.helpers.getBinaryDataBuffer(i, binaryKey);
-            fs.writeFileSync(tempInputFilePath, inputBuffer);
+            const binaryFields = getInputBinaryFields(inputBinaryFields, item);
 
-            // Replace {input} in the ffprobe command
-            const command = ffprobeCommand.replace('{input}', tempInputFilePath);
+            for (const [inputIndex, binaryField] of binaryFields.entries()) {
+                const binaryInfo = item.binary[binaryField];
+
+                if (!binaryInfo) {
+                    throw new Error(`Binary field "${binaryField}" was not found on item ${i}`);
+                }
+
+                const inputExtension = path.extname(binaryInfo.fileName || '') || '.mp4';
+                const tempInputFilePath = path.join(os.tmpdir(), `input_${Date.now()}_${i}_${inputIndex}_${Math.random().toString(36).slice(2)}${inputExtension}`);
+                const inputBuffer = await this.helpers.getBinaryDataBuffer(i, binaryField);
+                fs.writeFileSync(tempInputFilePath, inputBuffer);
+                tempInputFilePaths.push(tempInputFilePath);
+            }
+
+            const command = replaceInputPlaceholders(ffprobeCommand, tempInputFilePaths);
 
             const probeOutput = await runFfprobe(command);
             let parsedOutput: any = probeOutput;
@@ -98,7 +127,7 @@ export async function execute(
             }
             throw error;
         } finally {
-            fs.existsSync(tempInputFilePath) && fs.unlinkSync(tempInputFilePath);
+            tempInputFilePaths.forEach((f) => fs.existsSync(f) && fs.unlinkSync(f));
         }
     }
 

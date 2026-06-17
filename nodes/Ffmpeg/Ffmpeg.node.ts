@@ -68,12 +68,20 @@ export class Ffmpeg implements INodeType {
 				description: 'The description text',
 			},
 			{
+				displayName: 'Input Binary Fields',
+				name: 'inputBinaryFields',
+				type: 'string',
+				default: '',
+				placeholder: 'data, audio, subtitle',
+				description: 'Comma-separated binary field names to use as inputs. Leave empty to use the first binary field. Use {input}, {input1}, {input2}, etc. in the command.',
+			},
+			{
 				displayName: 'Command',
 				name: 'command',
 				type: 'string',
 				default: '',
-				placeholder: '-ss 0 -i {input} -t 30 -c copy {output}',
-				description: 'The ffmpeg command to execute use {input} and {output} to refer to the input and output file. The {input} comes from binary output of the previous node.',
+				placeholder: '-i {input1} -i {input2} -c copy {output}',
+				description: 'The command to execute. Use {input} or {input1}, {input2}, etc. for input files and {output} for ffmpeg output.',
 			},
 		],
 	};
