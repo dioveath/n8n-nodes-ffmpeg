@@ -51,6 +51,7 @@ For FFmpeg, the command should write to `{output}`. For FFprobe, the command sho
 - Resize video: `-i {input} -vf scale=640:360 {output}`
 - Trim video: `-i {input} -ss 00:00:10 -to 00:00:20 -c copy {output}`
 - Create a thumbnail: `-i {input} -ss 00:00:05 -vframes 1 {output}`
+- Overlay a second input using filter_complex: `-i {input} -i {input2} -filter_complex overlay=W-w-20:20 -c:v libx264 -c:a aac {output}`
 - Combine video and audio from separate binary fields: `-i {input1} -i {input2} -c:v copy -c:a aac {output}`
 - Probe media as JSON: `-v quiet -print_format json -show_format -show_streams {input}`
 
